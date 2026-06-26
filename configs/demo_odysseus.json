@@ -1,0 +1,19 @@
+{
+    "cpu_num_threads": 4,
+    "use_chat_template": false,
+    "cot": false,
+    "max_context_len": 4096,
+    "model_name": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "load_in_8bit": false,
+    "load_in_4bit": false,
+    "model_cls": "odysseus",
+    "cache_cls": "odysseus",
+    "use_flash_attn": false,
+    "num_of_selected_tokens": 0.067,
+    "selector_cls": "last",
+    "window_size": 16,
+    "probe_threshold": 0.3,
+    "block_size": 16,
+    "do_select_layers": "2,8,18",
+    "n_clusters": 0
+}

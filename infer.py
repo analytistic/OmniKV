@@ -24,13 +24,13 @@ if transformers.__version__ >= "4.40":
         BitsAndBytesConfig,
         GPTQConfig,
     )
-    from modeling._old_test import PreCheckLM
-    from modeling.token_model import TokenLM, TokenConfig
-    from modeling.select_once_model import TokenOnceLM, TokenOnceConfig
-    from modeling.offload_select_once import TokenOnceOffloadLM
-    from modeling.omnikv import OmniKVMulLM
-    from modeling.brutal_offload_llama import BrutalOffloadLM
-    from modeling.omnikv_config import LlamaCompressorConfig
+    from modeling.omnikv._old_test import PreCheckLM
+    from modeling.omnikv.token_model import TokenLM, TokenConfig
+    from modeling.omnikv.select_once_model import TokenOnceLM, TokenOnceConfig
+    from modeling.omnikv.offload_select_once import TokenOnceOffloadLM
+    from modeling.omnikv.omnikv import OmniKVMulLM
+    from modeling.omnikv.brutal_offload_llama import BrutalOffloadLM
+    from modeling.omnikv.omnikv_config import LlamaCompressorConfig
     from configs.template_for_chat import get_chat_template
     from baselines.infllm import get_infllm_api
 
@@ -355,6 +355,36 @@ def get_quest_chat_api(cfg_path):
     raise NotImplementedError
 
 
+def get_arachne_chat_api_bs1(cfg_path):
+    from modeling.arachnekv import ArachneLM
+    from modeling.omnikv.omnikv_config import LlamaCompressorConfig
+
+    config = read_config(cfg_path)
+    model_name = config["model_name"]
+    cfg = LlamaCompressorConfig.from_pretrained(model_name)
+    cfg.set_config_of_compressor(**config)
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype = torch.float16 if device == "cuda" else torch.float32
+    model = ArachneLM.from_pretrained(model_name, config=cfg, torch_dtype=dtype)
+    model.to(device)
+    model.eval()
+
+    tkn = AutoTokenizer.from_pretrained(model_name)
+    if tkn.pad_token is None:
+        tkn.add_special_tokens({"pad_token": "[PAD]"})
+        model.resize_token_embeddings(len(tkn))
+
+    def chat(prompt, generation_config=None, skip_special_tokens=False, **kwargs):
+        input_ids = tkn(prompt, return_tensors="pt")["input_ids"].to(device)
+        with torch.no_grad():
+            out = model.generate(input_ids, generation_config=generation_config, **kwargs)
+        out_ids = out[0][input_ids.shape[1]:]
+        return tkn.decode(out_ids, skip_special_tokens=skip_special_tokens, clean_up_tokenization_spaces=False)
+
+    return chat, tkn, config.get("max_context_len", 100_000), {"eos_token_id": tkn.eos_token_id}
+
+
 def get_any_chat_api(cfg_path):
     cfg = read_config(cfg_path)
     torch.set_num_threads(cfg.get("cpu_num_threads", 12))
@@ -365,10 +395,10 @@ def get_any_chat_api(cfg_path):
         return get_h2o_api.get_chat_api(cfg_path)
     elif "quest" in model_cls:
         raise NotImplementedError
-        # return get_quest_chat_api(cfg_path)
     elif "infllm" in model_cls:
-        # raise ValueError("难以适配")
         return get_infllm_chat_api_bs1(cfg_path)
+    elif "arachne" in model_cls:
+        return get_arachne_chat_api_bs1(cfg_path)
     else:
         return get_token_select_llama_chat_api_with_tokenizer_bs1(cfg_path)
 

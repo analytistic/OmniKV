@@ -295,11 +295,11 @@ class OmniKVMultiStageCache(transformers.cache_utils.DynamicCache):
         _r = self.layer_state[sel_layer_idx][2]
         sid = sel_layer_idx + self.num_wait_layers + 1
         for i in range(sid, _r):
-            self.part_key[i] = torch.index_select(self.key_cache[i], 2, _idx).cuda(
-                non_blocking=True
+            self.part_key[i] = torch.index_select(self.key_cache[i], 2, _idx).to(
+                device=self.key_cache[i].device, non_blocking=False
             )
-            self.part_value[i] = torch.index_select(self.value_cache[i], 2, _idx).cuda(
-                non_blocking=True
+            self.part_value[i] = torch.index_select(self.value_cache[i], 2, _idx).to(
+                device=self.value_cache[i].device, non_blocking=False
             )
         logger.info(
             f"index&to cuda for layer={sel_layer_idx} used={round(time.time() - st, 3)}s"

@@ -1,6 +1,6 @@
 from transformers.models.llama.modeling_llama import *
-from modeling.compressor import OmniKVCompressorConfig
-from modeling.spec_cache import DynamicBrutalOffloadCache
+from .compressor import OmniKVCompressorConfig
+from .spec_cache import DynamicBrutalOffloadCache
 import time
 from tiny_tools.log import logger
 

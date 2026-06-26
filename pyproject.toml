@@ -1,0 +1,36 @@
+[project]
+name = "omnikv"
+version = "1.0.0"
+description = "OmniKV: Dynamic Context Selection for Efficient Long-Context LLMs"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LEGAL.md" }
+authors = [
+    { name = "Jitai Hao et al." },
+]
+
+dependencies = [
+    "torch>=2.1.0",
+    "transformers==4.41.2",
+    "omegaconf",
+    "fuzzywuzzy",
+    "rouge",
+    "jieba",
+    "scipy>=1.13.1",
+    "scikit-learn>=1.6.1",
+    "matplotlib>=3.9.4",
+]
+
+[project.optional-dependencies]
+flash-attn = [
+    "flash-attn",
+]
+all = [
+    "flash-attn",
+    "rouge",
+    "fuzzywuzzy",
+    "jieba",
+]
+
+[project.urls]
+"Paper" = "https://openreview.net/forum?id=ulCAPXYXfa"

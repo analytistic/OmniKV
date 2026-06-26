@@ -1,13 +1,13 @@
 import torch
 from transformers.models.llama.modeling_llama import *
 from tiny_tools.log import logger, warning_once
-from modeling.omnikv_config import LlamaCompressorConfig
+from .omnikv_config import LlamaCompressorConfig
 from tiny_tools.tensor_tools import idx_tracer
 import pickle
 import os
 import time
-from modeling.patch_of_llama3_1 import PatchLlamaRotaryEmbedding
-from modeling.spec_cache import SinkCache
+from .patch_of_llama3_1 import PatchLlamaRotaryEmbedding
+from .spec_cache import SinkCache
 
 last_call_t = time.time()
 

@@ -1,7 +1,7 @@
 import torch
 
-from modeling.offload_select_once import *
-from modeling.spec_cache import OmniKVMultiStageCache, WOPackCache
+from .offload_select_once import *
+from .spec_cache import OmniKVMultiStageCache, WOPackCache
 import logging as lgt
 
 

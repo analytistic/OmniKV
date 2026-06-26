@@ -2,9 +2,9 @@ import os
 
 import torch
 from transformers.models.llama.modeling_llama import *
-from modeling.compressor import OmniKVCompressorConfig
-from modeling.spec_cache import get_cache_cls
-from modeling.patch_of_llama3_1 import PatchLlamaRotaryEmbedding
+from .compressor import OmniKVCompressorConfig
+from .spec_cache import get_cache_cls
+from .patch_of_llama3_1 import PatchLlamaRotaryEmbedding
 import time
 from tiny_tools.log import logger, warning_once
 from tiny_tools.tensor_tools import idx_tracer
